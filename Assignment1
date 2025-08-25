@@ -1,0 +1,142 @@
+DROP TABLE Member;
+DROP TABLE Books;
+DROP TABLE Issue;
+
+CREATE TABLE MEMBER (
+    member_Id Number(5) PRIMARY KEY,
+    member_name Varchar2(30) NOT NULL,
+    member_address Varchar2(50) NOT NULL,
+    acc_open_date date,
+    membership_type varchar2(20) NOT NULL,
+    fees_paid number(4) NOT NULL,
+    max_books_allowed number(2),
+    penalty_amount number(7,2)
+);
+
+CREATE TABLE BOOKS (
+    book_no number(6)PRIMARY KEY,
+    book_name varchar2(30) NOT NULL,
+    author_name varchar2(30) NOT NULL,
+    cost number(7,2) NOT NULL,
+    category char(10) NOT NULL
+);
+
+CREATE TABLE Issue(
+    lib_issue_id number(10),
+    book_no number(6),
+    member_Id number(5),
+    issue_date date,
+    return_date date,
+    FOREIGN KEY (member_Id) REFERENCES MEMBER(member_Id),
+    FOREIGN KEY (book_no) REFERENCES BOOKS(book_no)
+);
+
+INSERT INTO Member VALUES (101, 'Rohit', 'Pune', DATE '2006-07-15', 'Annual', 500, 5, 20.50);
+INSERT INTO Member VALUES (102, 'Geeta', 'Mumbai', DATE '2005-06-20', 'Half Yearly', 300, 4, 10.00);
+INSERT INTO Member VALUES (103, 'Rani', 'Delhi', DATE '2006-01-12', 'Quarterly', 200, 3, 5.00);
+INSERT INTO Member VALUES (104, 'Amit', 'Nagpur', DATE '2007-02-01', 'Annual', 400, 6, 0.00);
+SELECT * FROM MEMBER;
+
+INSERT INTO Books VALUES (7001, 'Learn SQL Basics', 'Loni', 550.00, 'Database');
+INSERT INTO Books VALUES (7002, 'Advanced DBMS', 'Sharma', 650.00, 'Database');
+INSERT INTO Books VALUES (7003, 'Fictional World', 'Loni', 500.00, 'Fiction');
+INSERT INTO Books VALUES (7004, 'Management Guru', 'Patil', 720.00, 'Management');
+INSERT INTO Books VALUES (7005, 'Science Today', 'Rakesh', 560.00, 'Science');
+INSERT INTO Books VALUES (7006, 'SQL Guide', 'Loni', 450.00, 'Database');
+INSERT INTO Books VALUES (7007, 'Operating Systems', 'Anil', 800.00, 'RDBMS');
+SELECT * FROM BOOKS;
+
+INSERT INTO Issue VALUES (90001, 7001, 101, DATE '2006-07-20', DATE '2006-08-01');
+INSERT INTO Issue VALUES (90002, 7002, 102, DATE '2006-08-15', NULL);   
+INSERT INTO Issue VALUES (90003, 7003, 101, DATE '2006-06-01', DATE '2006-06-25');
+INSERT INTO Issue VALUES (90004, 7004, 103, DATE '2006-05-15', NULL); 
+INSERT INTO Issue VALUES (90005, 7005, 104, DATE '2006-06-10', DATE '2006-07-15');
+INSERT INTO Issue VALUES (90006, 7006, 101, DATE '2006-07-01', NULL);   
+SELECT * FROM ISSUE;
+
+-- 1
+SELECT * FROM BOOKS WHERE author_name = 'Loni' AND cost < 600;
+
+-- 2
+SELECT * FROM ISSUE WHERE return_date IS NULL;
+
+-- 3
+UPDATE ISSUE SET return_date = DATE '2006-12-31' where return_date is NULL AND book_no NOT IN (7005, 7006);
+
+-- 4
+-- SELECT * FROM ISSUE (SELECT RETURN_DATE - ISSUE_DATE FROM ISSUE AS DIFFERENCE) WHERE DIFFERENCE > 30 ;
+
+-- 5
+SELECT * FROM BOOKS where cost between 500 and 750 AND CATEGORY = 'Database';
+
+-- 6
+SELECT * FROM BOOKS WHERE CATEGORY IN ('Science', 'Database', 'Fiction', 'Management');
+
+-- 7
+SELECT * FROM MEMBER ORDER BY penalty_amount DESC;
+
+-- 8
+SELECT * FROM BOOKS ORDER BY category ASC, cost DESC;
+
+-- 9
+SELECT * FROM BOOKS WHERE book_name LIKE '%SQL%';
+
+-- 10
+SELECT * FROM MEMBER WHERE (member_name LIKE 'R%' OR member_name LIKE 'G%' OR member_name LIKE '%I%');
+
+-- 11
+SELECT INITCAP(book_name) AS BookName, UPPER(author_name) AS AuthorName FROM BOOKS ORDER BY book_name DESC;
+
+-- 12
+SELECT lib_issue_id, TO_CHAR(ISSUE_DATE, 'Day, Month, DD, YYYY') AS issue_date, TO_CHAR(return_date, 'Day, Month, DD, YYYY') AS return_date FROM ISSUE WHERE MEMBER_ID = 101;
+
+-- 13
+SELECT * FROM BOOKS;
+SELECT book_no, book_name, author_name, cost, 
+    CASE(category)
+    WHEN 'Database' THEN 'D'
+    WHEN 'Science' THEN 'S'
+    WHEN 'RDBMS' THEN 'R'
+    ELSE 'O'
+    END AS Category_Code
+FROM BOOKS;
+
+-- 14
+SELECT * FROM MEMBER;
+-- SELECT * FROM MEMBER WHERE ACC_OPEN_DATE LIKE '%2006';
+
+-- 15
+SELECT * FROM ISSUE;
+SELECT lib_issue_id, ISSUE_DATE, RETURN_DATE, RETURN_DATE - ISSUE_DATE AS NO_OF_DAYS FROM ISSUE;
+
+-- 16
+SELECT * FROM MEMBER ORDER BY ACC_OPEN_DATE;
+
+-- 17
+SELECT * FROM ISSUE;
+SELECT COUNT(lib_issue_id) AS TOTAL_BOOKS FROM ISSUE WHERE member_id = 101;
+
+-- 18
+SELECT SUM(penalty_amount) AS PENALTY FROM MEMBER;
+
+-- 19
+SELECT COUNT(*) AS TOTALMEMBERS FROM MEMBER;
+
+-- 20
+SELECT * FROM MEMBER;
+SELECT COUNT(*) FROM ISSUE;
+
+-- 21
+SELECT AVG(FEES_PAID) FROM member;
+
+-- 22
+
+
+-- 23
+SELECT MEMBER_NAME, LENGTH(MEMBER_NAME) AS LENGTH FROM MEMBER;
+
+-- 24
+SELECT MEMBER_NAME, SUBSTR(MEMBERSHIP_TYPE, 1, 5) FROM MEMBER;
+
+-- 25
+SELECT lib_issue_id, issue_date, LAST_DAY(issue_date) FROM ISSUE;
