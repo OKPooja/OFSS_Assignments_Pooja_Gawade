@@ -1,0 +1,72 @@
+
+CREATE TABLE MEMBER (
+    member_Id Number(5) PRIMARY KEY,
+    member_name Varchar2(30) NOT NULL,
+    member_address Varchar2(50) NOT NULL,
+    acc_open_date date,
+    membership_type varchar2(20) NOT NULL,
+    fees_paid number(10) NOT NULL,
+    max_books_allowed number(2),
+    penalty_amount number(7,2)
+);
+
+CREATE TABLE BOOKS (
+    book_no number(6)PRIMARY KEY,
+    book_name varchar2(30) NOT NULL,
+    author_name varchar2(30) NOT NULL,
+    cost number(7,2) NOT NULL,
+    category char(10) NOT NULL
+);
+
+CREATE TABLE Issue(
+    lib_issue_id number(10),
+    book_no number(6),
+    member_Id number(5),
+    issue_date date,
+    return_date date,
+    FOREIGN KEY (member_Id) REFERENCES MEMBER(member_Id),
+    FOREIGN KEY (book_no) REFERENCES BOOKS(book_no)
+);
+
+ALTER TABLE ISSUE ADD REFERENCE CHAR(30);
+ALTER TABLE ISSUE DROP COLUMN REFERENCE;
+ALTER TABLE MEMBER MODIFY fees_paid number(10);
+DESC ISSUE;
+
+INSERT INTO MEMBER VALUES('1', 'Richa Sharma', 'Pune', '10-Dec-2005', 'Lifetime', 25000, 5, 50);
+INSERT INTO MEMBER VALUES('2', 'Garima Sen', 'Pune', SYSDATETIMEOFFSET, 'Annual', 1000, 3, null);
+INSERT INTO MEMBER VALUES('3', 'Jagjeet Singh Sappalllllll', 'Pune', '10-Dec-2005', 'Lifetime', 25000, 5, 50);
+INSERT INTO MEMBER VALUES('4', 'Jagjeet Singh Sappalllllll', 'Pune', '10-Dec-2007', 'Quarterly', 25000, 2, 10);
+ALTER TABLE MEMBER MODIFY member_name varchar2(20);
+INSERT INTO MEMBER VALUES('5', 'Ram Sharma', 'Mumbai', '20-Jan-2002', 'Quarterly', 30000, 110, 10);
+-- SQL> INSERT INTO MEMBER VALUES('5', 'Ram Sharma', 'Mumbai', '20-Jan-2002', 'Quarterly', 30000, 110, 10)
+-- ORA-01438: value 110 greater than specified precision (2, 0) for column 
+-- https://docs.oracle.com/error-help/db/ora-01438/
+-- Error at Line: 4 Column: 0
+CREATE TABLE MEMBER101 AS SELECT * FROM MEMBER;
+SELECT * FROM MEMBER101;
+ALTER TABLE MEMBER ADD CONSTRAINT check_books_allowed CHECK(max_books_allowed < 100);
+ALTER TABLE MEMBER ADD CONSTRAINT penalty_amt CHECK(penalty_amount  <= 1000);
+
+DROP TABLE BOOKS;
+ALTER TABLE BOOKS ADD CONSTRAINT check_category CHECK(category IN('Science', 'Fiction', 'Database', 'RDBMS', 'Others'));
+INSERT INTO BOOKS VALUES(101,'Let Us C', 'Denis Ritchie', 450, 'System');
+-- ORA-02290: check constraint (SQL_USKL9Q1LDWVFXRU9BUPIT7U67W.CHECK_CATEGORY) violated
+-- https://docs.oracle.com/error-help/db/ora-02290/
+-- Error at Line: 4 Column: 0
+INSERT INTO BOOKS VALUES(102,'Oracle – Complete Ref', 'Loni', 550, 'Database');
+INSERT INTO BOOKS VALUES(103,'Mastering SQL', 'Loni', 250, 'Database');
+INSERT INTO BOOKS VALUES(104,'PL SQL-Ref', 'Scott Urman', 750, 'Database');
+INSERT INTO BOOKS VALUES(101,'Let Us C', 'Denis Ritchie', 450, 'Others');
+INSERT INTO BOOKS (book_no, book_name, author_name, cost, category)
+VALUES (&book_no, &book_name, &author_name, &cost, &category);
+
+CREATE TABLE Book101 AS
+SELECT * FROM Books WHERE 1=0;
+DESC BOOK101;
+INSERT INTO BOOK101 SELECT * FROM BOOKS;
+SELECT * FROM BOOK101;
+COMMIT;
+SELECT * FROM BOOKS;
+INSERT INTO BOOKS values(105, 'National Geographic', 'Adis Scott', 1000, 'Science')
+ROLLBACK;
