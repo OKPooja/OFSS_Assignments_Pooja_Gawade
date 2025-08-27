@@ -70,3 +70,36 @@ COMMIT;
 SELECT * FROM BOOKS;
 INSERT INTO BOOKS values(105, 'National Geographic', 'Adis Scott', 1000, 'Science')
 ROLLBACK;
+DROP TABLE Issue;
+
+CREATE TABLE Issue (
+    Lib_Issue_Id NUMBER PRIMARY KEY,
+    Book_No NUMBER,
+    Member_ID NUMBER,
+    Issue_Date DATE,
+    Return_Date DATE,
+    CONSTRAINT fk_book FOREIGN KEY (Book_No) REFERENCES Books(Book_No),
+    CONSTRAINT fk_member FOREIGN KEY (Member_ID) REFERENCES Member(Member_ID),
+    CONSTRAINT chk_dates CHECK (Issue_Date < Return_Date)
+);
+INSERT INTO Issue VALUES (7001, 101, 1, TO_DATE('10-Dec-2006', 'DD-Mon-YYYY'), NULL);
+INSERT INTO Issue VALUES (7002, 102, 2, TO_DATE('25-Dec-2006', 'DD-Mon-YYYY'), NULL);
+INSERT INTO Issue VALUES (7003, 104, 1, TO_DATE('15-Jan-2006', 'DD-Mon-YYYY'), NULL);
+INSERT INTO Issue VALUES (7004, 101, 1, TO_DATE('04-Jul-2006', 'DD-Mon-YYYY'), NULL);
+INSERT INTO Issue VALUES (7005, 104, 2, TO_DATE('15-Nov-2006', 'DD-Mon-YYYY'), NULL);
+INSERT INTO Issue VALUES (7006, 101, 3, TO_DATE('18-Feb-2006', 'DD-Mon-YYYY'), NULL);
+COMMIT;
+ALTER TABLE Issue DISABLE CONSTRAINT fk_book;
+ALTER TABLE Issue DISABLE CONSTRAINT fk_member;
+ALTER TABLE Issue DISABLE CONSTRAINT chk_dates;
+INSERT INTO Issue VALUES (7007, 101, 999, TO_DATE('01-Aug-2006', 'DD-Mon-YYYY'), NULL);
+ALTER TABLE Issue ENABLE CONSTRAINT fk_member;
+
+DELETE FROM Issue WHERE Lib_Issue_Id = 7007;
+COMMIT;
+ALTER TABLE Issue ENABLE CONSTRAINT fk_member;
+DELETE FROM Member WHERE Member_ID = 1;
+UPDATE Issue SET Return_Date = Issue_Date + 15 WHERE Lib_Issue_Id IN (7004, 7005);
+UPDATE Member SET Penalty_Amount = 100 WHERE Member_Name = 'Garima Sen';
+SAVEPOINT X;
+DELETE FROM Issue WHERE Member_ID = 1 AND Issue_Date < TO_DATE('10-Dec-2006', 'DD-Mon-YYYY');
