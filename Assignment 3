@@ -1,0 +1,5 @@
+SELECT Category, COUNT(*) AS BookCount FROM Books GROUP BY Category;
+SELECT Book_No, COUNT(*) AS Issue_Count FROM Issue GROUP BY Book_No ORDER BY Issue_Count DESC;
+SELECT MAX(Penalty_Amount), MIN(Penalty_Amount), SUM(Penalty_Amount), AVG(Penalty_Amount) FROM Member;
+SELECT Member_ID, COUNT(*) FROM Issue GROUP BY Member_ID HAVING COUNT(*) > 1;
+SELECT Member_ID, Book_No, COUNT(*) AS issued FROM Issue GROUP BY Member_ID, Book_No ORDER BY issued DESC;
